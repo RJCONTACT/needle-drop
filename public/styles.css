@@ -301,7 +301,7 @@ a { color: inherit; }
 }
 
 /* ── Recently played row ─────────────────────────────────────────────────── */
-.recent { width: 100%; max-width: 1240px; margin: -1.5rem auto 2rem; padding: 0 clamp(1rem, 4vw, 3rem); }
+.recent { width: 100%; max-width: 1240px; margin: 1.25rem auto 2.5rem; padding: 0 clamp(1rem, 4vw, 3rem); }
 .recent[hidden] { display: none; }
 .recent__title {
   margin: 0 0 .9rem; font-size: .75rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
@@ -309,7 +309,7 @@ a { color: inherit; }
 .recent__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.25rem; }
 @media (max-width: 860px) {
   /* Phones: one swipeable row. Figma: horizontal Auto Layout with clip content off + scroll. */
-  .recent { margin-top: 0; }
+  .recent { margin-top: .75rem; }
   .recent__row { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 42%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .5rem; }
   .recent__row > li { scroll-snap-align: start; }
 }
@@ -433,13 +433,33 @@ a { color: inherit; }
   .stripes { top: 7.5rem; height: 6rem; }
   .crate-btn kbd, .deck__search kbd { display: none; }
 }
+/* Phones. Order top to bottom: header → TV + now playing → turntable →
+   recently played. Meters are decorative, so they go; the phone's own volume
+   buttons replace the knob. Figma: the mobile variant of the same frame. */
 @media (max-width: 520px) {
-  .header { gap: .75rem; padding-inline: .9rem; }
-  .logo { font-size: 1.3rem; white-space: nowrap; text-shadow: 1px 1px 0 var(--mustard), 2px 2px 0 var(--brown); }
-  .crate-btn { padding: .55rem .8rem .55rem .7rem; }
-  .folio { padding: .35rem .6rem; }
+  .header { gap: .6rem; padding: .9rem .9rem .5rem; }
+  .logo { font-size: 1.25rem; white-space: nowrap; text-shadow: 1px 1px 0 var(--mustard), 2px 2px 0 var(--brown); }
+  .crate-btn { padding: .5rem .75rem .5rem .65rem; gap: .5rem; font-size: .75rem; }
+  .folio { padding: .3rem .55rem; rotate: -1.5deg; box-shadow: 2px 2px 0 var(--rust); }
   .folio__small { display: none; }
-  .folio__big { font-size: .8125rem; }
+  .folio__big { font-size: .75rem; }
+  .folio__long { display: none; }
+
+  .console { gap: 1.25rem; padding: .5rem .9rem 4.25rem; }
+  .console::after { left: .9rem; right: .9rem; }
+  .rack { gap: .75rem; padding-bottom: 0; }
+  .tv { padding: .7rem; gap: .6rem; border-radius: 20px; }
+  .tv__panel { width: 1.6rem; gap: .5rem; }
+  .tv__dial { width: 1.6rem; }
+  .tv__dial--sm { width: 1.15rem; }
+  .readout { padding: .6rem .8rem; }
+  .meters { display: none; }
+  .stripes { top: 6rem; height: 5rem; }
+  .deck { max-width: 420px; }
+  .deck__search { font-size: .75rem; padding: .4rem .7rem; }
+  .recent { padding-inline: .9rem; }
+  .recent__row { grid-auto-columns: 44%; gap: 1rem; }
+  .footer { padding-inline: .9rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
