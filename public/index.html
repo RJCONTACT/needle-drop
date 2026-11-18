@@ -89,7 +89,19 @@
         <img src="/img/arm.webp" alt="" width="723" height="735">
         <span class="deck__arm-hit"></span>
       </button>
-      <p class="deck__hint" id="deckHint">Open the crate and pick a record</p>
+      <!-- Empty platter = the search button (Figma: a circular button
+           Component placed on the platter, hidden once a record lands). -->
+      <button class="deck__pick" id="pickBtn" aria-label="Search a song">
+        <span class="deck__pick-plus" aria-hidden="true">+</span>
+        <span>Search<br>a song</span>
+      </button>
+      <!-- Dymo label on the shelf under the deck: search is always one click
+           from the turntable. -->
+      <button class="deck__search" id="deckSearch">
+        <span class="deck__search-icon" aria-hidden="true"></span>
+        <span id="deckSearchText">Search a song</span>
+        <kbd aria-hidden="true">/</kbd>
+      </button>
     </section>
 
     <!-- Right column: TV (the YouTube player, always visible while playing), readout, meters, volume. -->

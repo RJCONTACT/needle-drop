@@ -88,6 +88,9 @@ function closeCrate() {
   setTimeout(() => { el.scrim.hidden = true; }, 300);
 }
 el.crateBtn.addEventListener('click', () => (isOpen() ? closeCrate() : openCrate()));
+// Search right at the turntable: the empty platter and the shelf label.
+$('#pickBtn').addEventListener('click', openCrate);
+$('#deckSearch').addEventListener('click', openCrate);
 el.crateClose.addEventListener('click', () => { closeCrate(); el.crateBtn.focus(); });
 el.scrim.addEventListener('click', closeCrate);
 addEventListener('keydown', (e) => {
@@ -309,6 +312,7 @@ async function put(id, from, ms) {
   el.record.hidden = false;
   el.record.setAttribute('aria-label', `${r.title}: click to play or pause`);
   el.deck.classList.add('has-record');
+  $('#deckSearchText').textContent = 'Search another song';
   showNow(r);
   remember(r);
   renderRecent();
