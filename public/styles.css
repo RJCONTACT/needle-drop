@@ -270,6 +270,20 @@ a { color: inherit; }
   body.crate-open { padding-left: min(440px, 92vw); }
 }
 
+/* ── Recently played row ─────────────────────────────────────────────────── */
+.recent { width: 100%; max-width: 1240px; margin: -1.5rem auto 2rem; padding: 0 clamp(1rem, 4vw, 3rem); }
+.recent[hidden] { display: none; }
+.recent__title {
+  margin: 0 0 .9rem; font-size: .75rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
+}
+.recent__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.25rem; }
+@media (max-width: 860px) {
+  /* Phones: one swipeable row. Figma: horizontal Auto Layout with clip content off + scroll. */
+  .recent { margin-top: 0; }
+  .recent__row { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 42%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .5rem; }
+  .recent__row > li { scroll-snap-align: start; }
+}
+
 /* ── Crate drawer ───────────────────────────────────────────────────────── */
 /* Figma: an overlay frame sliding in from the left (Smart Animate, Move In). */
 .crate {

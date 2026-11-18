@@ -16,7 +16,7 @@ const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const el = {
   crate: $('#crate'), crateBtn: $('#crateBtn'), crateClose: $('#crateClose'), scrim: $('#scrim'),
   form: $('#searchForm'), q: $('#q'), status: $('#status'), chips: $('#chips'),
-  results: $('#results'), played: $('#played'), tabs: document.querySelectorAll('.tab'),
+  results: $('#results'), played: $('#played'), recent: $('#recent'), recentWrap: $('#recentWrap'), tabs: document.querySelectorAll('.tab'),
   deck: $('#deck'), deckOn: $('#deckOn'), record: $('#record'), spin: $('#spin'), label: $('#recordLabel'),
   arm: $('#arm'), tv: document.querySelector('.tv'),
   nowTitle: $('#nowTitle'), nowArtist: $('#nowArtist'), nowTime: $('#nowTime'),
@@ -177,7 +177,7 @@ const markSleeve = (b) => {
 const refreshSleeves = () => document.querySelectorAll('.sleeve').forEach(markSleeve);
 
 // Click a sleeve → record goes to the platter. Drag works too (mouse/pen).
-[el.results, el.played].forEach((list) => {
+[el.results, el.played, el.recent].forEach((list) => {
   list.addEventListener('click', (e) => {
     const b = e.target.closest('.sleeve');
     if (!b || b.dataset.dragged) { if (b) delete b.dataset.dragged; return; }
@@ -199,6 +199,14 @@ function remember(r) {
   const list = [r, ...readHistory().filter((x) => x.id !== r.id)].slice(0, 24);
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch { /* private mode: skip */ }
 }
+// The 6 most recent on the page itself.
+function renderRecent() {
+  const list = readHistory().slice(0, 6);
+  el.recentWrap.hidden = !list.length;
+  renderRecords(el.recent, list);
+}
+renderRecent();
+
 function renderPlayed() {
   const list = readHistory();
   renderRecords(el.played, list);
@@ -303,6 +311,7 @@ async function put(id, from, ms) {
   el.deck.classList.add('has-record');
   showNow(r);
   remember(r);
+  renderRecent();
   needle('drop');
   load(r.id);
 }
