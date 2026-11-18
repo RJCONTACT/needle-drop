@@ -252,11 +252,25 @@ loadHot();
 // Count a play for the Hot chart (anonymous; see privacy page).
 const countPlay = (id) => fetch('/api/play', { method: 'POST', body: JSON.stringify({ id }), keepalive: true }).catch(() => {});
 
-// The 6 most recent on the page itself.
+// Starter crate for first-time visitors: six retro records in the site's
+// 70s spirit (disco, funk, city pop, Bollywood, soul, jazz). IDs checked as
+// playable on Needle Drop. Figma analogy: placeholder content in an empty state.
+const thumb = (id) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const STARTERS = [
+  { id: 'B2mmDEv0OEk', title: 'September', artist: 'Earth, Wind & Fire' },
+  { id: 'aXgSHL7efKg', title: 'Le Freak', artist: 'CHIC' },
+  { id: 'T_lC2O1oIew', title: 'Plastic Love', artist: 'Mariya Takeuchi' },
+  { id: 'Gqv7n-lNfT0', title: 'Chura Liya Hai Tumne Jo Dil Ko', artist: 'Asha Bhosle · R.D. Burman' },
+  { id: 'oaLDut30Br0', title: 'Lovely Day', artist: 'Bill Withers' },
+  { id: 'P6fxBUzOrcU', title: 'Take Five', artist: 'Dave Brubeck Quartet' },
+].map((r) => ({ ...r, cover: thumb(r.id) }));
+
+// The 6 most recent on the page itself; the starter crate until there are any.
 function renderRecent() {
   const list = readHistory().slice(0, 6);
-  el.recentWrap.hidden = !list.length;
-  renderRecords(el.recent, list);
+  $('#recentTitle').textContent = list.length ? 'Recently played' : 'Start with these';
+  el.recentWrap.hidden = false;
+  renderRecords(el.recent, list.length ? list : STARTERS);
 }
 renderRecent();
 
