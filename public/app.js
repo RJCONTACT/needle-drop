@@ -16,7 +16,7 @@ const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const el = {
   crate: $('#crate'), crateBtn: $('#crateBtn'), crateClose: $('#crateClose'), scrim: $('#scrim'),
   form: $('#searchForm'), q: $('#q'), status: $('#status'), chips: $('#chips'),
-  results: $('#results'), played: $('#played'), recent: $('#recent'), recentWrap: $('#recentWrap'), tabs: document.querySelectorAll('.tab'),
+  results: $('#results'), played: $('#played'), recent: $('#recent'), recentWrap: $('#recentWrap'), hot: $('#hot'), hotWrap: $('#hotWrap'), tabs: document.querySelectorAll('.tab'),
   deck: $('#deck'), deckOn: $('#deckOn'), record: $('#record'), spin: $('#spin'), label: $('#recordLabel'),
   arm: $('#arm'), tv: document.querySelector('.tv'),
   nowTitle: $('#nowTitle'), nowArtist: $('#nowArtist'), nowTime: $('#nowTime'),
@@ -106,7 +106,7 @@ function showTab(name) {
   el.tabs.forEach((t) => { const on = t.dataset.tab === name; t.classList.toggle('is-on', on); t.setAttribute('aria-selected', on); });
   el.results.hidden = name !== 'results';
   el.played.hidden = name !== 'played';
-  el.chips.hidden = name !== 'results' || el.results.children.length > 0;
+  el.chips.hidden = name !== 'results' || !!el.q.value.trim();
   if (name === 'played') renderPlayed();
 }
 
@@ -153,6 +153,7 @@ function clearSearch() {
   el.results.replaceChildren();
   setStatus('');
   showTab('results');
+  showHotInCrate();
   el.q.focus();
 }
 qClear.addEventListener('click', clearSearch);
@@ -189,6 +190,10 @@ function renderRecords(list, records) {
     b.querySelector('.label').style.backgroundImage = `url("${r.cover}")`;
     b.querySelector('.sleeve__title').textContent = r.title;
     b.querySelector('.sleeve__artist').textContent = r.artist;
+    if (r.plays > 1) {
+      const n = Object.assign(document.createElement('span'), { className: 'sleeve__plays', textContent: `${r.plays} listeners` });
+      b.append(n);
+    }
     markSleeve(b);
     li.append(b);
     return li;
@@ -202,7 +207,7 @@ const markSleeve = (b) => {
 const refreshSleeves = () => document.querySelectorAll('.sleeve').forEach(markSleeve);
 
 // Click a sleeve → record goes to the platter. Drag works too (mouse/pen).
-[el.results, el.played, el.recent].forEach((list) => {
+[el.results, el.played, el.recent, el.hot].forEach((list) => {
   list.addEventListener('click', (e) => {
     const b = e.target.closest('.sleeve');
     if (!b || b.dataset.dragged) { if (b) delete b.dataset.dragged; return; }
@@ -224,6 +229,29 @@ function remember(r) {
   const list = [r, ...readHistory().filter((x) => x.id !== r.id)].slice(0, 24);
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch { /* private mode: skip */ }
 }
+// Hot this week: shared across everyone. Shown on the page, and in the crate
+// whenever there's no search yet.
+let hotRecords = [];
+async function loadHot() {
+  try {
+    const res = await fetch('/api/hot');
+    if (!res.ok) return;
+    hotRecords = (await res.json()).records || [];
+  } catch { return; }
+  el.hotWrap.hidden = !hotRecords.length;
+  renderRecords(el.hot, hotRecords.slice(0, 6));   // one row on the page; the crate shows all 8
+  if (!el.q.value) showHotInCrate();
+}
+function showHotInCrate() {
+  if (!hotRecords.length) return;
+  renderRecords(el.results, hotRecords);
+  el.chips.hidden = false;
+  setStatus('Hot this week');
+}
+loadHot();
+// Count a play for the Hot chart (anonymous; see privacy page).
+const countPlay = (id) => fetch('/api/play', { method: 'POST', body: JSON.stringify({ id }), keepalive: true }).catch(() => {});
+
 // The 6 most recent on the page itself.
 function renderRecent() {
   const list = readHistory().slice(0, 6);
@@ -338,6 +366,7 @@ async function put(id, from, ms) {
   showNow(r);
   remember(r);
   renderRecent();
+  countPlay(r.id);
   needle('drop');
   load(r.id);
 }
@@ -463,6 +492,7 @@ function loadApi() {
 async function load(id) {
   await loadApi();
   el.tv.classList.add('is-live');
+  tvFirst();
   if (!yt) {
     await new Promise((ready) => {
       yt = new YT.Player('player', {
@@ -477,6 +507,16 @@ async function load(id) {
   }
   if (id === state.placed) play();
 }
+// Phones: once music plays, move the TV above the turntable (animated with a
+// View Transition where the browser supports it) and bring it into view.
+function tvFirst() {
+  if (document.body.classList.contains('tv-first') || innerWidth >= 860) return;
+  const swap = () => document.body.classList.add('tv-first');
+  if (document.startViewTransition && !reduced()) document.startViewTransition(swap);
+  else swap();
+  requestAnimationFrame(() => el.tv.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }));
+}
+
 function onYtState({ data }) {
   // Someone used the TV's own controls: keep the turntable in step.
   if (data === YT.PlayerState.PLAYING) {

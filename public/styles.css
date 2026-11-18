@@ -306,6 +306,11 @@ a { color: inherit; }
 .recent__title {
   margin: 0 0 .9rem; font-size: .75rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
 }
+.recent + .recent { margin-top: 0; }
+/* Small blinking "on air" light before the Hot title. */
+.hot-dot { display: inline-block; width: 8px; height: 8px; margin-right: .5rem; border-radius: 50%; background: var(--rust); box-shadow: 0 0 6px var(--rust); vertical-align: 1px; animation: on-air 1.6s ease-in-out infinite; }
+@keyframes on-air { 50% { opacity: .35; } }
+.sleeve__plays { display: block; margin-top: .1rem; font-size: .6875rem; color: var(--rust); font-weight: 600; letter-spacing: .04em; }
 .recent__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.25rem; }
 @media (max-width: 860px) {
   /* Phones: one swipeable row. Figma: horizontal Auto Layout with clip content off + scroll. */
@@ -437,7 +442,23 @@ a { color: inherit; }
   .header__tag { display: none; }
   .folio { margin-left: auto; }
   .console { grid-template-columns: 1fr; align-items: start; gap: 1.5rem; padding-top: 1rem; }
-  .rack { order: -1; max-width: 480px; width: 100%; justify-self: center; }
+  /* Before anything plays, the turntable comes first and the TV waits below.
+     Once music starts, the TV moves to the top so the video stays in view.
+     Figma: the same frame with two Variants, "idle" and "playing". */
+  .rack { max-width: 480px; width: 100%; justify-self: center; }
+  body.tv-first .rack { order: -1; }
+  /* The shelf travels with the turntable: drawn under the deck itself. */
+  .console::after { display: none; }
+  .console { padding-bottom: 1.5rem; }
+  .deck { margin-bottom: 3.25rem; }
+  .deck::after {
+    content: ''; position: absolute; left: -4%; right: -4%; top: 100%; height: 3rem; z-index: -1;
+    background:
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, .06) 0 2px, transparent 2px 23px),
+      linear-gradient(var(--walnut), var(--walnut-dark));
+    border-radius: 6px;
+    box-shadow: 0 18px 30px -12px rgba(43, 27, 18, .55), inset 0 2px 0 rgba(255, 255, 255, .12);
+  }
   .stripes { top: 7.5rem; height: 6rem; }
   .crate-btn kbd, .deck__search kbd { display: none; }
 }
@@ -453,8 +474,7 @@ a { color: inherit; }
   .folio__big { font-size: .75rem; }
   .folio__long { display: none; }
 
-  .console { gap: 1.25rem; padding: .5rem .9rem 4.25rem; }
-  .console::after { left: .9rem; right: .9rem; }
+  .console { gap: 1.25rem; padding: .5rem .9rem 1.25rem; }
   .rack { gap: .75rem; padding-bottom: 0; }
   .tv { padding: .7rem; gap: .6rem; border-radius: 20px; }
   .tv__panel { width: 1.6rem; gap: .5rem; }
