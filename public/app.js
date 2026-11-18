@@ -272,6 +272,11 @@ function renderRecent() {
   const list = readHistory().slice(0, 6);
   $('#recentTitle').textContent = list.length ? 'Recently played' : 'Start with these';
   el.recentWrap.hidden = false;
+  // Your own records come first once you have some; until then Hot leads and
+  // the starter crate follows. Figma analogy: reordering two frames in an
+  // Auto Layout stack depending on a Variant.
+  if (list.length) el.hotWrap.before(el.recentWrap);
+  else el.hotWrap.after(el.recentWrap);
   renderRecords(el.recent, list.length ? list : STARTERS);
 }
 renderRecent();
