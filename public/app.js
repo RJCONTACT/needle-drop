@@ -74,6 +74,7 @@ const narrow = () => innerWidth < 1100;
 let crateEverOpened = false;
 function openCrate() {
   crateEverOpened = true;
+  warm();
   el.crate.inert = false;
   el.crate.classList.add('is-open');
   document.body.classList.add('crate-open');
@@ -217,6 +218,7 @@ const refreshSleeves = () => document.querySelectorAll('.sleeve').forEach(markSl
     const from = sleeveRecordRect(b);
     if (narrow()) closeCrate();
     put(b.dataset.id, from);
+    startNow(b.dataset.id);
   });
   list.addEventListener('pointerdown', (e) => {
     const b = e.target.closest('.sleeve');
@@ -359,7 +361,7 @@ function dragFromSleeve(b, e) {
     const s = parseFloat(flyer.style.width);
     const from = new DOMRect(ev.clientX - s / 2, ev.clientY - s / 2, s, s);
     flyer.remove();
-    if (over(ev.clientX, ev.clientY)) put(r.id, from, 450);
+    if (over(ev.clientX, ev.clientY)) { put(r.id, from, 450); startNow(r.id); }
     else { fly(r.cover, from, sleeveRecordRect(b), 500).then(refreshSleeves); }
   };
   addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
@@ -397,16 +399,19 @@ function play() {
   if (!state.placed) { el.arm.animate([{ rotate: '0deg' }, { rotate: '2deg' }, { rotate: '-1.5deg' }, { rotate: '0deg' }], 400); return; }
   clearTimers();
   state.arm = 'cueing';
+  // Phones (and in-app browsers like Instagram's) only allow sound that
+  // starts inside the tap itself. So start the video now at volume 0 and
+  // bring the volume up when the needle lands.
+  if (ytOk) { yt.setVolume(0); yt.playVideo(); }
   setArm(ARM.outer, { lifted: true });
   later(reduced() ? 0 : 850, () => {
     setArm(currentArmAngle(), { lifted: false });
     later(reduced() ? 0 : 260, () => {
-      state.arm = 'playing'; motor(true); yt?.playVideo?.();
-      // Some phones block playback that doesn't start straight from a tap.
+      state.arm = 'playing'; motor(true);
+      if (ytOk) { yt.setVolume(volume); yt.playVideo(); }
+      // Still blocked (some in-app browsers block everything): ask for a tap.
       later(2500, () => {
-        if (state.arm === 'playing' && yt?.getPlayerState?.() !== YT.PlayerState.PLAYING) {
-          el.nowArtist.textContent = 'Tap play on the TV to start';
-        }
+        if (state.arm === 'playing' && yt?.getPlayerState?.() !== YT.PlayerState.PLAYING) showTapHint(true);
       });
     });
   });
@@ -430,7 +435,7 @@ const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
 // Arm follows the song: outer groove at 0:00, near the label at the end.
 function currentArmAngle() {
   const d = yt?.getDuration?.() || 0, t = yt?.getCurrentTime?.() || 0;
-  const p = d ? Math.min(1, t / d) : 0;
+  const p = isLive() ? 0.15 : d ? Math.min(1, t / d) : 0;
   return ARM.outer + (ARM.inner - ARM.outer) * p;
 }
 
@@ -488,10 +493,14 @@ function showNow(r) {
     line.style.setProperty('--dur', `${Math.max(8, r.title.length * 0.35)}s`);
   });
 }
-const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+// m:ss, or h:mm:ss for long mixes.
+const pad = (n) => String(Math.floor(n)).padStart(2, '0');
+const fmt = (s) => (s >= 3600 ? `${Math.floor(s / 3600)}:${pad((s % 3600) / 60)}:${pad(s % 60)}` : `${Math.floor(s / 60)}:${pad(s % 60)}`);
+// Live streams report the time since the stream began, not a length.
+const isLive = () => !!(yt?.getVideoData?.()?.isLive) || (yt?.getDuration?.() || 0) > 12 * 3600;
 setInterval(() => {
-  if (!yt?.getCurrentTime) return;
-  el.nowTime.textContent = `${fmt(yt.getCurrentTime())} / ${fmt(yt.getDuration() || 0)}`;
+  if (!yt?.getCurrentTime || !state.placed) return;
+  el.nowTime.textContent = isLive() ? '● LIVE' : `${fmt(yt.getCurrentTime())} / ${fmt(yt.getDuration() || 0)}`;
   if (state.arm === 'playing') setArm(currentArmAngle(), { tracking: true });
 }, 600);
 
@@ -499,7 +508,7 @@ setInterval(() => {
 // Loaded only when the first record is played, so the page stays light.
 // The player is always visible on the TV, at least 200 × 200 px, with
 // YouTube's own controls and links left untouched.
-let yt = null, ytReady = null;
+let yt = null, ytReady = null, ytOk = false, warming = null, startedEarly = null;
 function loadApi() {
   ytReady ??= new Promise((resolve) => {
     window.onYouTubeIframeAPIReady = resolve;
@@ -510,40 +519,67 @@ function loadApi() {
   });
   return ytReady;
 }
+// Get the player ready before it's needed (first touch anywhere, or when the
+// crate opens), so a tap on a record can start the music straight away.
+// Figma analogy: preloading the next frame in a prototype.
+function warm() {
+  warming ??= loadApi().then(() => new Promise((ready) => {
+    yt = new YT.Player('player', {
+      playerVars: { playsinline: 1, rel: 0, origin: location.origin },
+      events: { onReady: () => { ytOk = true; yt.setVolume(volume); ready(); }, onStateChange: onYtState, onError: onYtError },
+    });
+  }));
+  return warming;
+}
+addEventListener('pointerdown', () => warm(), { once: true, capture: true });
+addEventListener('keydown', () => warm(), { once: true, capture: true });
+
+// Called inside the tap/drop that picks a record: start the video silently
+// right now (allowed, because it's part of the tap); the turntable catches up.
+function startNow(id) {
+  if (!ytOk) return;
+  startedEarly = id;
+  state.arm = 'cueing';
+  el.tv.classList.add('is-live');   // never play under the "no signal" cover
+  tvFirst();
+  yt.setVolume(0);
+  yt.loadVideoById(id);
+}
+
 async function load(id) {
-  await loadApi();
+  await warm();
+  if (id !== state.placed) return;               // another record was picked meanwhile
   el.tv.classList.add('is-live');
   tvFirst();
-  if (!yt) {
-    await new Promise((ready) => {
-      yt = new YT.Player('player', {
-        videoId: id,
-        playerVars: { playsinline: 1, rel: 0, origin: location.origin },
-        events: { onReady: ready, onStateChange: onYtState, onError: onYtError },
-      });
-    });
-    yt.setVolume(volume);
-  } else {
-    yt.cueVideoById(id);
-  }
-  if (id === state.placed) play();
+  if (startedEarly === id) startedEarly = null;  // already playing (silently)
+  else yt.cueVideoById(id);
+  play();
+}
+
+// "Tap ▶ on the TV" label, shown only when the browser blocked playback.
+function showTapHint(on) {
+  el.tv.classList.toggle('needs-tap', on);
+  if (on) el.tv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 // Phones: once music plays, move the TV above the turntable (animated with a
 // View Transition where the browser supports it) and bring it into view.
 function tvFirst() {
   if (document.body.classList.contains('tv-first') || innerWidth >= 860) return;
   const swap = () => document.body.classList.add('tv-first');
-  if (document.startViewTransition && !reduced()) document.startViewTransition(swap);
-  else swap();
-  requestAnimationFrame(() => el.tv.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }));
+  // Scroll only after the TV has actually moved, or we'd scroll to its old spot.
+  const show = () => el.tv.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+  if (document.startViewTransition && !reduced()) document.startViewTransition(swap).finished.then(show, show);
+  else { swap(); requestAnimationFrame(show); }
 }
 
 function onYtState({ data }) {
   // Someone used the TV's own controls: keep the turntable in step.
   if (data === YT.PlayerState.PLAYING) {
+    showTapHint(false);
     const r = state.records.get(state.placed);
     if (r) el.nowArtist.textContent = r.artist;
     if (state.arm === 'rest') { state.arm = 'playing'; setArm(currentArmAngle()); motor(true); }
+    if (state.arm !== 'cueing') yt.setVolume(volume);   // e.g. after a tap on the TV
   }
   if (data === YT.PlayerState.PAUSED && state.arm === 'playing') pause();
   if (data === YT.PlayerState.ENDED) { pause(); setArm(ARM.rest); }

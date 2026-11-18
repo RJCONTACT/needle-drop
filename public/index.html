@@ -125,6 +125,8 @@
     <!-- Right column: TV (the YouTube player, always visible while playing), readout, meters, volume. -->
     <section class="rack" aria-label="Now playing">
       <div class="tv">
+        <!-- Shown only if the browser blocked playback (some in-app browsers). -->
+        <span class="tv__hint" aria-live="polite">Tap ▶ on the TV to play</span>
         <div class="tv__screen">
           <div id="player"></div>
           <div class="tv__static" id="static" aria-hidden="true"><span>No signal</span></div>
