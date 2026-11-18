@@ -71,7 +71,9 @@ const state = {
 const isOpen = () => el.crate.classList.contains('is-open');
 // Below 1100px the crate covers the page (with a dim backdrop) instead of pushing it.
 const narrow = () => innerWidth < 1100;
+let crateEverOpened = false;
 function openCrate() {
+  crateEverOpened = true;
   el.crate.inert = false;
   el.crate.classList.add('is-open');
   document.body.classList.add('crate-open');
@@ -586,7 +588,7 @@ el.knob.addEventListener('keydown', (e) => {
   ['pointerdown', 'wheel', 'touchmove', 'keydown', 'scroll'].forEach((t) =>
     addEventListener(t, () => { lastTouch = performance.now(); }, { passive: true }));
   const check = () => {
-    if (state.placed || isOpen() || el.crateBtn.getAttribute('aria-expanded') === 'true') return; // found it
+    if (state.placed || crateEverOpened) return;   // they found search, or are already playing
     if (busy()) { setTimeout(check, 2000); return; }
     try { sessionStorage.setItem('needle-drop:nudged', '1'); } catch { /* ignore */ }
     openCrate();
