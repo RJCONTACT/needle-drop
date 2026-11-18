@@ -245,3 +245,33 @@ html.modern .footer { color: var(--muted); font-family: var(--sans); }
   html.modern .crate { inset: auto 8px 8px 8px; width: auto; height: min(84vh, 720px); transform: translateY(calc(100% + 30px)); }
   html.modern .crate.is-open { transform: none; }
 }
+
+/* ── Concentric pills ───────────────────────────────────────────────────────
+   A pill inside a pill only looks right when the gap is the same on every
+   side: outer radius = inner radius + gap. So every control in the header
+   and the search bar is one fixed height, and the bar adds the same 6px
+   padding all round. Figma analogy: Auto Layout with equal padding, fixed
+   child height, and corner radius = half the height. */
+html.modern { --ctl: 44px; --gap: 6px; }
+html.modern .header { padding: var(--gap); gap: .5rem; }
+html.modern :is(.crate-btn, .mode-btn, .folio) {
+  height: var(--ctl); box-sizing: border-box; padding-block: 0; display: inline-flex; align-items: center;
+}
+html.modern .crate-btn { padding-inline: .95rem 1rem; }
+html.modern .mode-btn { padding-inline: 1rem; }
+html.modern .folio { padding-inline: 1.1rem; }
+html.modern .folio__small { display: none; }           /* one line, so it fits the 44px pill */
+html.modern .logo { padding-left: .35rem; }
+
+html.modern .dymo { height: 52px; padding: var(--gap) var(--gap) var(--gap) 1.1rem; gap: var(--gap); }
+html.modern .dymo input { padding: 0; height: 100%; }
+html.modern .dymo__go { height: 40px; padding: 0 1.1rem; display: inline-flex; align-items: center; }
+html.modern .dymo__clear { width: 40px; height: 40px; }
+
+@media (max-width: 520px) {
+  html.modern { --ctl: 40px; --gap: 5px; }
+  html.modern .header { padding: var(--gap); }
+  html.modern .crate-btn { padding-inline: .8rem .85rem; }
+  html.modern .mode-btn { width: var(--ctl); padding: 0; justify-content: center; }
+  html.modern .folio { padding-inline: .85rem; }
+}
