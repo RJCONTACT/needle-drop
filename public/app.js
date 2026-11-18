@@ -572,5 +572,24 @@ el.knob.addEventListener('keydown', (e) => {
   if (e.key === 'End') setVolume(100);
 });
 
-// First visit: open the crate so search is the first thing people see.
-if (!readHistory().length && !narrow()) openCrate();
+// Don't open the crate on arrival. If someone has been here a while without
+// playing anything or opening the crate, they're probably looking for search,
+// so open it for them once (15 s on desktop, 20 s on phones). Never while
+// they're mid-scroll or mid-click, and only once per visit.
+// Figma analogy: an "After delay" prototype trigger that's cancelled by any
+// other interaction with the frame.
+(() => {
+  let nudged = false, lastTouch = 0;
+  try { nudged = sessionStorage.getItem('needle-drop:nudged') === '1'; } catch { /* ignore */ }
+  if (nudged) return;
+  const busy = () => performance.now() - lastTouch < 2500;
+  ['pointerdown', 'wheel', 'touchmove', 'keydown', 'scroll'].forEach((t) =>
+    addEventListener(t, () => { lastTouch = performance.now(); }, { passive: true }));
+  const check = () => {
+    if (state.placed || isOpen() || el.crateBtn.getAttribute('aria-expanded') === 'true') return; // found it
+    if (busy()) { setTimeout(check, 2000); return; }
+    try { sessionStorage.setItem('needle-drop:nudged', '1'); } catch { /* ignore */ }
+    openCrate();
+  };
+  setTimeout(check, narrow() ? 20000 : 15000);
+})();
