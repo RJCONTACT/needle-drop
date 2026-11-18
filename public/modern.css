@@ -275,3 +275,13 @@ html.modern .dymo__clear { width: 40px; height: 40px; }
   html.modern .mode-btn { width: var(--ctl); padding: 0; justify-content: center; }
   html.modern .folio { padding-inline: .85rem; }
 }
+
+/* Inner radius = outer radius − padding (the same rule for non-pill corners).
+   TV: card 28, padding 10 → screen 18.
+   Search sheet: search pill 26 (half of 52), sheet padding 12 → sheet 38. */
+html.modern { --r-tv: 28px; --p-tv: 10px; --p-sheet: 12px; }
+html.modern .tv { border-radius: var(--r-tv); padding: var(--p-tv); }
+html.modern .tv__screen { border-radius: calc(var(--r-tv) - var(--p-tv)); }
+html.modern .crate { border-radius: calc(26px + var(--p-sheet)); }
+html.modern .crate__top { padding: var(--p-sheet) var(--p-sheet) .5rem var(--p-sheet); }
+html.modern .crate__close { width: 52px; height: 52px; }
