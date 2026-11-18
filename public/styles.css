@@ -87,6 +87,17 @@ a { color: inherit; }
 .folio__small { font-size: .6875rem; color: var(--ink-soft); }
 .folio__big { font-weight: 600; font-size: .875rem; color: var(--rust); }
 
+/* Design switch (Retro ⇄ Modern). Retro look: a small cream button. */
+.mode-btn {
+  flex: none; display: inline-flex; align-items: center; gap: .45rem; cursor: pointer;
+  padding: .5rem .8rem; border: 1.5px solid var(--ink); border-radius: 999px; background: transparent;
+  font: 600 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink);
+}
+.mode-btn:hover { background: var(--ink); color: var(--paper); }
+/* Half-filled circle: "switch the look". */
+.mode-btn__icon { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid currentColor; background: linear-gradient(90deg, currentColor 50%, transparent 50%); }
+.ambient, .eq { display: none; }
+
 /* ── Console: turntable + rack on a walnut shelf ────────────────────────── */
 /* Figma: a two-column Auto Layout (deck | rack) with a shelf rectangle behind. */
 .console {
@@ -453,7 +464,7 @@ a { color: inherit; }
 /* ── Tablets and phones: TV on top, turntable under it ──────────────────── */
 @media (max-width: 860px) {
   .header__tag { display: none; }
-  .folio { margin-left: auto; }
+  .mode-btn { margin-left: auto; }
   .console { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 1.5rem; padding-top: 1rem; }
   /* Before anything plays, the turntable comes first and the TV waits below.
      Once music starts, the TV moves to the top so the video stays in view.
@@ -486,6 +497,8 @@ a { color: inherit; }
   .folio__small { display: none; }
   .folio__big { font-size: .75rem; }
   .folio__long { display: none; }
+  .mode-btn { padding: .45rem; }
+  .mode-btn__text { display: none; }
 
   .console { gap: 1.25rem; padding: .5rem .9rem 1.25rem; }
   .rack { gap: .75rem; padding-bottom: 0; }

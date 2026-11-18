@@ -481,8 +481,31 @@ function needle() {
   } catch { /* no audio: fine */ }
 }
 
+// ── Design switch: Retro ⇄ Modern ──────────────────────────────────────────
+// Saved per browser; ?mode=modern in the link opens it directly.
+// Figma analogy: flipping one Variant property on the whole page.
+const modeBtn = $('#modeBtn');
+function syncModeBtn() {
+  const modern = document.documentElement.classList.contains('modern');
+  modeBtn.querySelector('.mode-btn__text').textContent = modern ? 'Retro' : 'Modern';
+  modeBtn.setAttribute('aria-pressed', modern);
+  modeBtn.setAttribute('aria-label', modern ? 'Switch to the retro design' : 'Switch to the modern design');
+  document.querySelector('meta[name="theme-color"]').content = modern ? '#0b0b0e' : '#2b1b12';
+}
+modeBtn.addEventListener('click', () => {
+  const flip = () => {
+    const modern = document.documentElement.classList.toggle('modern');
+    try { localStorage.setItem('needle-drop:mode', modern ? 'modern' : 'retro'); } catch { /* ignore */ }
+    syncModeBtn();
+  };
+  if (document.startViewTransition && !reduced()) document.startViewTransition(flip); else flip();
+});
+syncModeBtn();
+
 // ── Readout ────────────────────────────────────────────────────────────────
 function showNow(r) {
+  // Modern mode's background glow uses the cover.
+  document.documentElement.style.setProperty('--cover', `url("${r.cover}")`);
   el.nowTitle.textContent = r.title;
   el.nowArtist.textContent = r.artist;
   const line = el.nowTitle.parentElement;
