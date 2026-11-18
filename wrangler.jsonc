@@ -1,0 +1,18 @@
+// Cloudflare Workers settings for Needle Drop.
+// Figma analogy: the "file settings" panel for the published site.
+{
+  "name": "needle-drop",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-09",
+  "assets": {
+    // The site itself: plain HTML, CSS, JS and images. No build step.
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Only the search address goes through the worker; everything else is
+    // served straight from Cloudflare's cache.
+    "run_worker_first": ["/api/*"]
+  },
+  // The YouTube key is NOT here. Add it in the Cloudflare dashboard as a
+  // secret named YOUTUBE_API_KEY (Settings → Variables and Secrets).
+  "previews": {}
+}

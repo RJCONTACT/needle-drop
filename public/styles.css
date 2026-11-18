@@ -1,0 +1,378 @@
+/* Needle Drop — retro hi-fi styles.
+   Figma analogy: the :root block is the Variables panel (colour and type
+   tokens); every class below is a Component; @media blocks are breakpoint
+   variants of the same frame. */
+
+:root {
+  /* Colours — 70s living room: cream wall, rust/mustard/brown stripes, walnut. */
+  --wall: #efe3c8;
+  --paper: #f7efdc;
+  --ink: #2b1b12;
+  --ink-soft: #6b5442;
+  --rust: #c8552b;
+  --mustard: #e09b2d;
+  --brown: #7a4a2a;
+  --walnut: #5b3620;
+  --walnut-dark: #3a2213;
+  --amber: #ffb43a;
+  --screen: #0d0a08;
+
+  /* Type */
+  --display: 'Shrikhand', Georgia, serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --radius: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh;
+  font: 400 15px/1.5 var(--mono);
+  color: var(--ink);
+  background-color: var(--wall);
+  /* Paper grain: an SVG noise texture laid over the wall colour
+     (Figma: a Noise effect on the background fill). */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.17 0 0 0 0 0.1 0 0 0 0 0.07 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  display: flex; flex-direction: column;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--rust); outline-offset: 3px; }
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+/* Figma: a horizontal Auto Layout, space-between. */
+.header {
+  display: flex; align-items: center; gap: 1.25rem;
+  padding: 1.25rem clamp(1rem, 4vw, 3rem);
+}
+.logo {
+  margin: 0; order: -1;
+  font: 400 clamp(1.75rem, 3.4vw, 2.6rem)/1 var(--display);
+  color: var(--rust);
+  /* 70s offset shadow: two stacked copies in mustard and brown. */
+  text-shadow: 2px 2px 0 var(--mustard), 4px 4px 0 var(--brown);
+  letter-spacing: .01em;
+}
+.header__tag { margin: 0; color: var(--ink-soft); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; }
+.crate-btn {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: .6rem;
+  padding: .65rem 1rem .65rem .8rem;
+  background: var(--ink); color: var(--paper);
+  border: 0; border-radius: 999px; cursor: pointer;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .12em; font-size: .8125rem;
+  box-shadow: 0 3px 0 var(--rust);
+  transition: translate .15s var(--ease), box-shadow .15s var(--ease);
+}
+.crate-btn:hover { translate: 0 -1px; box-shadow: 0 4px 0 var(--rust); }
+.crate-btn:active { translate: 0 2px; box-shadow: 0 1px 0 var(--rust); }
+/* Three stacked lines like records standing in a crate. */
+.crate-btn__icon { width: 16px; height: 12px; background: linear-gradient(var(--mustard) 0 2px, transparent 2px 5px, var(--mustard) 5px 7px, transparent 7px 10px, var(--mustard) 10px 12px); }
+.crate-btn kbd { font: inherit; font-size: .75rem; padding: 0 .4rem; border: 1px solid rgba(247, 239, 220, .35); border-radius: 4px; opacity: .7; }
+
+/* ── Console: turntable + rack on a walnut shelf ────────────────────────── */
+/* Figma: a two-column Auto Layout (deck | rack) with a shelf rectangle behind. */
+.console {
+  position: relative; flex: 1; overflow-x: clip;
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .8fr);
+  align-items: end; gap: clamp(1.5rem, 4vw, 3.5rem);
+  width: 100%; max-width: 1240px; margin: 0 auto;
+  padding: 2rem clamp(1rem, 4vw, 3rem) 4.5rem;
+}
+/* Walnut shelf the hi-fi stands on. */
+.console::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 1.5rem; height: 3rem; z-index: -1;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .06) 0 2px, transparent 2px 23px),
+    linear-gradient(var(--walnut), var(--walnut-dark));
+  border-radius: 6px;
+  box-shadow: 0 18px 30px -12px rgba(43, 27, 18, .55), inset 0 2px 0 rgba(255, 255, 255, .12);
+}
+/* The 70s stripes running behind everything. */
+.stripes {
+  position: absolute; left: 50%; width: 100vw; translate: -50% 0; top: 34%; height: 9rem; z-index: -2;
+  background: linear-gradient(var(--mustard) 0 33.3%, var(--rust) 33.3% 66.6%, var(--brown) 66.6%);
+  opacity: .92;
+}
+
+/* ── Deck (geometry measured on the 749 × 691 photo) ────────────────────── */
+.deck { position: relative; width: 100%; max-width: 640px; justify-self: center; aspect-ratio: 749 / 691; }
+.deck__img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; user-select: none;
+  filter: drop-shadow(0 22px 22px rgba(43, 27, 18, .45)) drop-shadow(0 2px 2px rgba(0, 0, 0, .35));
+}
+/* Lamp-on photo cross-fades in while the motor runs. */
+.deck__img--on { opacity: 0; transition: opacity .35s ease; }
+.deck__img--on.is-on { opacity: 1; }
+.deck.is-target .deck__img { filter: drop-shadow(0 0 0 transparent) drop-shadow(0 0 18px rgba(224, 155, 45, .9)); }
+
+/* Record on the platter: centred on the spindle (46.33%, 49.93%), 71.25% of the deck wide. */
+.deck__record {
+  all: unset; position: absolute; left: 46.33%; top: 49.93%; width: 70.81%; aspect-ratio: 1;
+  translate: -50% -50%; cursor: pointer;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .5));
+}
+.deck__record[hidden] { display: none; }
+.deck__record:focus-visible { outline: 3px solid var(--mustard); outline-offset: 4px; border-radius: 50%; }
+.deck__spin { position: relative; display: block; width: 100%; height: 100%; will-change: transform; }
+.deck__spin img { display: block; width: 100%; height: 100%; user-select: none; pointer-events: none; }
+/* The record label: the song's cover, cropped to a circle (label = 35.1% of the disc photo). */
+.label {
+  position: absolute; left: 32.45%; top: 32.45%; width: 35.1%; height: 35.1%;
+  border-radius: 50%; background: #e9e1cf center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.label::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 5.5%; aspect-ratio: 1; translate: -50% -50%;
+  border-radius: 50%; background: #2a2a2a;
+}
+.deck__spindle {
+  position: absolute; left: 46.33%; top: 49.93%; width: 1.4%; aspect-ratio: 1; translate: -50% -50%;
+  border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f4f4f4, #a6a6a6 55%, #4d4d4d);
+  pointer-events: none;
+}
+/* Tonearm: rotates about its bearing. Box and pivot are set from app.js. */
+.deck__arm {
+  all: unset; position: absolute; aspect-ratio: 723 / 735;
+  transform: rotate(var(--rot, 0deg));
+  pointer-events: none;
+  filter: drop-shadow(2px 5px 3px rgba(0, 0, 0, .45));
+  transition: transform .85s cubic-bezier(.45, .05, .25, 1), scale .26s ease, filter .26s ease;
+}
+.deck__arm.is-tracking { transition: transform .6s linear, scale .26s ease, filter .26s ease; }
+.deck__arm.is-lifted { scale: 1.025; filter: drop-shadow(7px 16px 9px rgba(0, 0, 0, .38)); }
+.deck__arm img { display: block; width: 100%; height: auto; user-select: none; pointer-events: none; }
+/* Only the strip along the arm takes clicks. */
+.deck__arm-hit {
+  position: absolute; left: -9.27%; top: 51.29%; width: 105.1%; height: 9.52%;
+  transform: rotate(135.2deg); border-radius: 999px;
+  pointer-events: auto; cursor: pointer;
+}
+.deck__arm:focus-visible .deck__arm-hit { outline: 3px solid var(--mustard); outline-offset: 2px; }
+.deck__hint {
+  position: absolute; left: 46.33%; top: 49.93%; translate: -50% -50%; margin: 0;
+  width: 44%; text-align: center; pointer-events: none;
+  color: rgba(247, 239, 220, .8); font-size: .8125rem; text-transform: uppercase; letter-spacing: .12em;
+  transition: opacity .3s ease;
+}
+.deck.has-record .deck__hint { opacity: 0; }
+
+/* ── Rack: TV, readout, meters ──────────────────────────────────────────── */
+/* Figma: a vertical Auto Layout, gap 1rem. */
+.rack { display: flex; flex-direction: column; gap: 1rem; padding-bottom: 1rem; }
+
+/* CRT TV in an orange plastic shell. The screen holds the YouTube player and
+   never drops below 200 × 200 px (YouTube's minimum player size). */
+.tv {
+  display: grid; grid-template-columns: 1fr auto; gap: .9rem;
+  padding: 1rem; border-radius: 26px;
+  background: linear-gradient(160deg, #e0773f, var(--rust) 55%, #a8431f);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .25), inset 0 -4px 0 rgba(0, 0, 0, .2), 0 16px 26px -10px rgba(43, 27, 18, .55);
+}
+.tv__screen {
+  position: relative; aspect-ratio: 4 / 3; min-width: 200px; min-height: 200px;
+  border-radius: 22px / 18px; overflow: hidden; background: var(--screen);
+  box-shadow: inset 0 0 0 6px #2a1a10, inset 0 0 24px rgba(0, 0, 0, .9);
+}
+.tv__screen iframe, .tv__screen #player { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+/* "No signal": animated static, shown until a record plays. */
+.tv__static {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"),
+    radial-gradient(circle, #2b2b2b, #050505);
+  animation: static .18s steps(3) infinite;
+  transition: opacity .4s ease;
+}
+.tv__static span {
+  padding: .2rem .55rem; background: rgba(0, 0, 0, .6); color: var(--paper);
+  font-size: .75rem; letter-spacing: .2em; text-transform: uppercase;
+}
+.tv.is-live .tv__static { opacity: 0; pointer-events: none; }
+@keyframes static { 0% { background-position: 0 0, 0 0; } 33% { background-position: -40px 20px, 0 0; } 66% { background-position: 30px -50px, 0 0; } }
+.tv__panel { display: flex; flex-direction: column; align-items: center; gap: .7rem; width: 2.6rem; padding-top: .3rem; }
+.tv__dial {
+  width: 2.3rem; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff4dc, #c9b892 60%, #8c7a58);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .3), inset 0 0 0 3px rgba(0, 0, 0, .08);
+  position: relative;
+}
+.tv__dial::after { content: ''; position: absolute; left: 50%; top: 10%; width: 2px; height: 32%; translate: -50% 0; background: var(--ink); }
+.tv__dial--sm { width: 1.6rem; }
+.tv__grille { flex: 1; width: 100%; min-height: 3rem; background: repeating-linear-gradient(rgba(0, 0, 0, .35) 0 2px, transparent 2px 6px); border-radius: 6px; }
+
+/* Amber readout: song title scrolls if it doesn't fit. */
+.readout {
+  padding: .75rem 1rem; border-radius: 10px;
+  background: #1a120c; color: var(--amber);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, .8), 0 1px 0 rgba(255, 255, 255, .4);
+  text-shadow: 0 0 6px rgba(255, 180, 58, .55);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.readout__line { overflow: hidden; white-space: nowrap; font-weight: 600; }
+.readout__line span { display: inline-block; }
+.readout__line.is-scrolling span { padding-left: 100%; animation: marquee var(--dur, 12s) linear infinite; }
+@keyframes marquee { to { transform: translateX(-100%); } }
+.readout__sub { display: flex; justify-content: space-between; gap: 1rem; font-size: .75rem; opacity: .75; }
+.readout__sub span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* VU meters + volume knob. The meters are decorative: YouTube doesn't give
+   pages the audio, so they move with play/pause, not the real signal. */
+.meters { display: grid; grid-template-columns: 1fr 1fr auto; gap: .75rem; align-items: end; }
+.vu {
+  position: relative; aspect-ratio: 1.6; overflow: hidden; border-radius: 8px;
+  background: radial-gradient(circle at 50% 30%, #fbf0cf, #ecd9a6);
+  box-shadow: inset 0 0 0 4px #1a120c, inset 0 8px 16px rgba(0, 0, 0, .22);
+}
+.vu__face { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vu b { position: absolute; left: 10px; bottom: 6px; z-index: 1; font-size: .6875rem; color: var(--ink-soft); }
+.vu__needle {
+  position: absolute; left: 50%; bottom: -12%; width: 2px; height: 92%;
+  background: var(--ink); transform-origin: 50% 100%; translate: -50% 0;
+  transform: rotate(var(--a, -42deg));
+  transition: transform .12s ease-out;
+}
+.knob-wrap { display: flex; flex-direction: column; align-items: center; gap: .35rem; }
+.knob-wrap b { font-size: .6875rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .12em; }
+.knob {
+  width: 3.6rem; aspect-ratio: 1; border-radius: 50%; cursor: grab; touch-action: none;
+  background: conic-gradient(#d9d9d9, #8f8f8f, #f2f2f2, #9a9a9a, #e1e1e1, #8a8a8a, #d9d9d9);
+  box-shadow: 0 4px 0 #4d4d4d, 0 8px 14px rgba(0, 0, 0, .35), inset 0 0 0 4px rgba(255, 255, 255, .35);
+  position: relative; transform: rotate(var(--k, 54deg));
+}
+.knob span { position: absolute; left: 50%; top: 8%; width: 3px; height: 28%; translate: -50% 0; background: var(--rust); border-radius: 2px; }
+.knob:focus-visible { outline-offset: 6px; border-radius: 50%; }
+
+/* Wide screens: the open crate pushes the hi-fi to the right instead of
+   covering it. Figma analogy: a sidebar in an Auto Layout row, not an overlay. */
+@media (min-width: 1100px) {
+  body { transition: padding-left .45s var(--ease); }
+  body.crate-open { padding-left: min(440px, 92vw); }
+}
+
+/* ── Crate drawer ───────────────────────────────────────────────────────── */
+/* Figma: an overlay frame sliding in from the left (Smart Animate, Move In). */
+.crate {
+  position: fixed; inset: 0 auto 0 0; z-index: 20;
+  width: min(440px, 92vw);
+  display: flex; flex-direction: column;
+  background: var(--paper);
+  border-right: 14px solid var(--walnut);
+  box-shadow: 20px 0 40px -10px rgba(43, 27, 18, .45);
+  transform: translateX(calc(-100% - 20px));
+  transition: transform .45s var(--ease);
+}
+.crate.is-open { transform: none; }
+.crate__top { display: flex; gap: .6rem; align-items: center; padding: 1rem 1rem .5rem; }
+.crate__close {
+  flex: none; width: 2.5rem; height: 2.5rem; border: 0; border-radius: 50%; cursor: pointer;
+  background: transparent; font-size: 1.6rem; line-height: 1; color: var(--ink-soft);
+}
+.crate__close:hover { background: rgba(43, 27, 18, .08); color: var(--ink); }
+
+/* Search field styled as embossed Dymo label tape. */
+.dymo {
+  flex: 1; display: flex; align-items: center;
+  background: var(--ink); border-radius: 4px; padding: 0 .35rem 0 .9rem;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .12);
+  rotate: -.6deg;
+}
+.dymo input {
+  flex: 1; min-width: 0; padding: .8rem 0; border: 0; background: transparent; outline: none;
+  color: #fff; font: 600 1rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .6), 0 -1px 0 rgba(255, 255, 255, .25);
+}
+.dymo input::placeholder { color: rgba(255, 255, 255, .45); }
+.dymo input::-webkit-search-cancel-button { filter: invert(1); }
+.dymo:focus-within { outline: 3px solid var(--mustard); outline-offset: 3px; }
+.dymo__go {
+  border: 0; border-radius: 3px; padding: .45rem .7rem; cursor: pointer;
+  background: var(--mustard); color: var(--ink); font-weight: 600; text-transform: uppercase; letter-spacing: .1em; font-size: .75rem;
+}
+
+.tabs { display: flex; gap: 1.25rem; padding: .5rem 1.1rem 0; border-bottom: 1px solid rgba(43, 27, 18, .15); }
+.tab {
+  border: 0; background: none; cursor: pointer; padding: .5rem 0; margin-bottom: -1px;
+  font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-soft);
+  border-bottom: 3px solid transparent;
+}
+.tab.is-on { color: var(--ink); border-color: var(--rust); }
+.crate__status { margin: .6rem 1.1rem 0; min-height: 1.2em; font-size: .8125rem; color: var(--ink-soft); }
+.crate__status:empty { display: none; }
+.chips { display: flex; flex-wrap: wrap; gap: .45rem; padding: .75rem 1rem 0; }
+.chips[hidden] { display: none; }
+.chip {
+  border: 1.5px solid var(--ink); background: transparent; border-radius: 999px; cursor: pointer;
+  padding: .3rem .75rem; font-size: .75rem;
+}
+.chip:hover { background: var(--mustard); }
+
+/* Results bin: records standing in two columns. */
+.bin {
+  list-style: none; margin: 0; padding: 1rem 1rem 1.5rem;
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem .9rem; align-content: start;
+}
+.bin[hidden] { display: none; }
+.sleeve {
+  all: unset; display: block; width: 100%; cursor: pointer; touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+.sleeve__photo {
+  position: relative; display: block; aspect-ratio: 908 / 613;
+  filter: drop-shadow(0 4px 5px rgba(43, 27, 18, .35));
+  transition: translate .25s var(--ease), rotate .25s var(--ease);
+}
+.sleeve:hover .sleeve__photo, .sleeve:focus-visible .sleeve__photo { translate: 0 -4px; rotate: -1deg; }
+.sleeve:focus-visible .sleeve__photo { outline: 3px solid var(--rust); outline-offset: 3px; }
+.sleeve__photo img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+/* The song's cover printed on the sleeve. Multiply keeps the paper's wear
+   showing through (Figma: layer blend mode Multiply). */
+.sleeve__art {
+  position: absolute; left: .88%; top: 1.31%; width: 66.41%; height: 97.39%;
+  background: center / cover no-repeat; mix-blend-mode: multiply;
+}
+/* The label of the record peeking out, clipped where it goes under the sleeve. */
+.sleeve__label { position: absolute; left: 57.49%; top: 35.07%; width: 20.7%; height: 30.67%; clip-path: inset(0 0 0 47.3%); pointer-events: none; }
+.sleeve__label .label { inset: 0; left: 0; top: 0; width: 100%; height: 100%; }
+.sleeve.is-out .sleeve__full, .sleeve.is-out .sleeve__label { opacity: 0; }
+.sleeve__empty { position: absolute; inset: 0; opacity: 0; }
+.sleeve.is-out .sleeve__empty { opacity: 1; }
+.sleeve__title {
+  display: block; margin-top: .5rem; font-size: .8125rem; font-weight: 600; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.sleeve__artist { display: block; font-size: .75rem; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sleeve.is-playing .sleeve__title::before { content: '▶ '; color: var(--rust); }
+/* Loading placeholders while a search runs. */
+.bin .ghost { aspect-ratio: 908 / 613; border-radius: 4px; background: linear-gradient(90deg, #eadfc6, #f4ead4, #eadfc6); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.crate__foot { margin: 0; padding: .6rem 1.1rem .9rem; font-size: .6875rem; color: var(--ink-soft); border-top: 1px solid rgba(43, 27, 18, .12); }
+
+.scrim { position: fixed; inset: 0; z-index: 15; background: rgba(43, 27, 18, .35); opacity: 0; transition: opacity .3s ease; }
+.scrim.is-on { opacity: 1; }
+
+/* A record being dragged or flying (lives on <body>). */
+.flyer { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; }
+.flyer img { display: block; width: 100%; height: 100%; }
+.flyer.is-drag { filter: drop-shadow(0 18px 14px rgba(0, 0, 0, .45)); }
+
+.footer { padding: 0 clamp(1rem, 4vw, 3rem) 1.5rem; font-size: .75rem; color: var(--ink-soft); text-align: center; }
+.footer p { margin: 0; }
+
+/* ── Tablets and phones: TV on top, turntable under it ──────────────────── */
+@media (max-width: 860px) {
+  .header__tag { display: none; }
+  .console { grid-template-columns: 1fr; align-items: start; gap: 1.5rem; padding-top: 1rem; }
+  .rack { order: -1; max-width: 480px; width: 100%; justify-self: center; }
+  .stripes { top: 7.5rem; height: 6rem; }
+  .crate-btn kbd { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
