@@ -121,6 +121,7 @@ async function search(q) {
   q = q.trim();
   if (!q) return;
   el.q.value = q;
+  qClear.hidden = false;
   showTab('results');
   el.chips.hidden = true;
   const id = ++searchId;
@@ -141,6 +142,27 @@ async function search(q) {
 }
 const setStatus = (t) => { el.status.textContent = t; };
 el.form.addEventListener('submit', (e) => { e.preventDefault(); search(el.q.value); });
+
+// Clear: empty the field, the results and the status; bring the suggestions
+// back. Figma analogy: resetting the search Component to its default Variant.
+const qClear = $('#qClear');
+function clearSearch() {
+  searchId++;                                // ignore a search still in flight
+  el.q.value = '';
+  qClear.hidden = true;
+  el.results.replaceChildren();
+  setStatus('');
+  showTab('results');
+  el.q.focus();
+}
+qClear.addEventListener('click', clearSearch);
+el.q.addEventListener('input', () => {
+  qClear.hidden = !el.q.value;
+  if (!el.q.value) clearSearch();            // deleting the text also resets
+});
+el.q.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && el.q.value) { e.preventDefault(); e.stopPropagation(); clearSearch(); }
+});
 el.chips.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) search(c.dataset.q); });
 
 // ── Records in sleeves ─────────────────────────────────────────────────────
