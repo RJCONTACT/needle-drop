@@ -155,7 +155,8 @@ a { color: inherit; }
 }
 .deck__arm:focus-visible .deck__arm-hit { outline: 3px solid var(--mustard); outline-offset: 2px; }
 .deck__hint {
-  position: absolute; left: 46.33%; top: 49.93%; translate: -50% -50%; margin: 0;
+  /* Sits on the empty platter's outer ring, above the silver centre. */
+  position: absolute; left: 46.33%; top: 27%; translate: -50% -50%; margin: 0;
   width: 44%; text-align: center; pointer-events: none;
   color: rgba(247, 239, 220, .8); font-size: .8125rem; text-transform: uppercase; letter-spacing: .12em;
   transition: opacity .3s ease;
@@ -219,7 +220,8 @@ a { color: inherit; }
 .readout__line.is-scrolling span { padding-left: 100%; animation: marquee var(--dur, 12s) linear infinite; }
 @keyframes marquee { to { transform: translateX(-100%); } }
 .readout__sub { display: flex; justify-content: space-between; gap: 1rem; font-size: .75rem; opacity: .75; }
-.readout__sub span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.readout__sub span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.readout__sub span:last-child { flex: none; white-space: nowrap; }
 
 /* VU meters + volume knob. The meters are decorative: YouTube doesn't give
    pages the audio, so they move with play/pause, not the real signal. */
