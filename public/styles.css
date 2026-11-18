@@ -186,7 +186,6 @@ a { color: inherit; }
 @keyframes pick-pulse { 0% { opacity: .9; scale: 1; } 100% { opacity: 0; scale: 1.35; } }
 .deck__pick:hover { scale: 1.05; }
 .deck__pick:focus-visible { outline: 3px solid var(--mustard); outline-offset: 5px; }
-.deck__pick-plus { font: 400 clamp(1.4rem, 3vw, 2.2rem)/1 var(--display); color: var(--rust); }
 .deck.has-record .deck__pick { opacity: 0; pointer-events: none; }
 
 /* Dymo label stuck on the shelf, centred under the deck. */
