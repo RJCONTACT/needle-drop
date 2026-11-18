@@ -50,16 +50,16 @@ a { color: inherit; }
   padding: 1.25rem clamp(1rem, 4vw, 3rem);
 }
 .logo {
-  margin: 0; order: -1;
+  margin: 0;
   font: 400 clamp(1.75rem, 3.4vw, 2.6rem)/1 var(--display);
   color: var(--rust);
   /* 70s offset shadow: two stacked copies in mustard and brown. */
   text-shadow: 2px 2px 0 var(--mustard), 4px 4px 0 var(--brown);
   letter-spacing: .01em;
 }
-.header__tag { margin: 0; color: var(--ink-soft); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; }
+.header__tag { margin: 0 0 0 auto; color: var(--ink-soft); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; }
 .crate-btn {
-  margin-left: auto;
+  flex: none;
   display: inline-flex; align-items: center; gap: .6rem;
   padding: .65rem 1rem .65rem .8rem;
   background: var(--ink); color: var(--paper);
@@ -73,6 +73,19 @@ a { color: inherit; }
 /* Three stacked lines like records standing in a crate. */
 .crate-btn__icon { width: 16px; height: 12px; background: linear-gradient(var(--mustard) 0 2px, transparent 2px 5px, var(--mustard) 5px 7px, transparent 7px 10px, var(--mustard) 10px 12px); }
 .crate-btn kbd { font: inherit; font-size: .75rem; padding: 0 .4rem; border: 1px solid rgba(247, 239, 220, .35); border-radius: 4px; opacity: .7; }
+
+/* Portfolio badge: a cream sticker with a rust edge, tilted a little.
+   Figma: a frame with a 2px stroke, rotation -2°, hover = lift. */
+.folio {
+  flex: none; display: grid; text-decoration: none; text-align: right;
+  padding: .45rem .9rem; border: 2px solid var(--rust); border-radius: 10px;
+  background: var(--paper); rotate: -2deg;
+  box-shadow: 3px 3px 0 var(--rust);
+  transition: translate .15s var(--ease), box-shadow .15s var(--ease);
+}
+.folio:hover { translate: -1px -2px; box-shadow: 5px 5px 0 var(--rust); }
+.folio__small { font-size: .6875rem; color: var(--ink-soft); }
+.folio__big { font-weight: 600; font-size: .875rem; color: var(--rust); }
 
 /* ── Console: turntable + rack on a walnut shelf ────────────────────────── */
 /* Figma: a two-column Auto Layout (deck | rack) with a shelf rectangle behind. */
@@ -370,10 +383,19 @@ a { color: inherit; }
 /* ── Tablets and phones: TV on top, turntable under it ──────────────────── */
 @media (max-width: 860px) {
   .header__tag { display: none; }
+  .folio { margin-left: auto; }
   .console { grid-template-columns: 1fr; align-items: start; gap: 1.5rem; padding-top: 1rem; }
   .rack { order: -1; max-width: 480px; width: 100%; justify-self: center; }
   .stripes { top: 7.5rem; height: 6rem; }
   .crate-btn kbd { display: none; }
+}
+@media (max-width: 520px) {
+  .header { gap: .75rem; padding-inline: .9rem; }
+  .logo { font-size: 1.3rem; white-space: nowrap; text-shadow: 1px 1px 0 var(--mustard), 2px 2px 0 var(--brown); }
+  .crate-btn { padding: .55rem .8rem .55rem .7rem; }
+  .folio { padding: .35rem .6rem; }
+  .folio__small { display: none; }
+  .folio__big { font-size: .8125rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }

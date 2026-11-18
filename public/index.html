@@ -21,6 +21,7 @@
       console → walnut shelf with the turntable (left) and the TV + meters (right)
   -->
   <header class="header">
+    <!-- Left: the Crate button, on the same side the drawer slides in from. -->
     <button class="crate-btn" id="crateBtn" aria-controls="crate" aria-expanded="false">
       <span class="crate-btn__icon" aria-hidden="true"></span>
       <span>Crate</span>
@@ -28,6 +29,11 @@
     </button>
     <h1 class="logo">Needle Drop</h1>
     <p class="header__tag">Every song is a record</p>
+    <!-- Right: the way to Rishik's portfolio. Figma: a pinned badge Component. -->
+    <a class="folio" href="https://rishik-jha.rishikrkjha.workers.dev/?ref=needle-drop" target="_blank" rel="noopener">
+      <span class="folio__small">Designed &amp; built by Rishik Jha</span>
+      <span class="folio__big">See my portfolio <span aria-hidden="true">↗</span></span>
+    </a>
   </header>
 
   <!-- Search drawer. Hidden off-screen until opened. -->
@@ -61,7 +67,7 @@
     <ul class="bin" id="results" role="tabpanel" aria-labelledby="tabResults"></ul>
     <ul class="bin" id="played" role="tabpanel" aria-labelledby="tabPlayed" hidden></ul>
 
-    <p class="crate__foot">Search by YouTube · <a href="/privacy.html">Privacy</a></p>
+    <p class="crate__foot">Search by YouTube · <a href="/privacy.html">Privacy</a> · Made by <a href="https://rishik-jha.rishikrkjha.workers.dev/?ref=needle-drop" target="_blank" rel="noopener">Rishik Jha ↗</a></p>
   </aside>
   <div class="scrim" id="scrim" hidden></div>
 
@@ -118,7 +124,7 @@
 
   <footer class="footer">
     <p>Music plays through YouTube. Needle Drop is a fan-made player and isn't affiliated with YouTube.
-      <a href="/privacy.html">Privacy &amp; terms</a> · Made by <a href="https://rishik-jha.rishikrkjha.workers.dev" target="_blank" rel="noopener">Rishik Jha</a></p>
+      <a href="/privacy.html">Privacy &amp; terms</a> · Designed &amp; built by <a href="https://rishik-jha.rishikrkjha.workers.dev/?ref=needle-drop" target="_blank" rel="noopener">Rishik Jha</a></p>
   </footer>
 
   <script src="/app.js" type="module"></script>
